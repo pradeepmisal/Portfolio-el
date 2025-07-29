@@ -126,7 +126,8 @@ body {
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
-  min-height: 100vh;
+  /* min-height: 100vh; */
+  /* Remove this line */
 }
 
 /* ===== GLASSMORPHISM SYSTEM ===== */

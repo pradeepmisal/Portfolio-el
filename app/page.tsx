@@ -96,6 +96,9 @@ export default function Home() {
     <>
       {isLoading && <Preloader onComplete={handlePreloaderComplete} />}
 
+      {/* Move Navigation component here, outside the data-scroll-container */}
+      <Navigation />
+
       <div className={`main-content ${contentVisible ? "content-visible" : "content-hidden"}`} data-scroll-container>
         {/* Global particles */}
         <div className="particles-container">
@@ -117,7 +120,8 @@ export default function Home() {
         <div className="floating-orb floating-orb-2"></div>
         <div className="floating-orb floating-orb-3"></div>
 
-        <Navigation />
+        {/* Remove Navigation from here */}
+        {/* <Navigation /> */}
         <Hero />
         <About />
         <Skills />
