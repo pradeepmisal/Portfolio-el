@@ -1,62 +1,103 @@
 "use client"
 
-import { FaCode, FaBrain, FaTools, FaLaptopCode } from "react-icons/fa"
+import { useEffect, useRef } from "react"
 
-export default function SkillsClustered() {
+export default function Skills() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const skillsRef = useRef<HTMLDivElement>(null)
+
   const skillGroups = [
     {
       title: "Programming Languages",
-      icon: <FaLaptopCode className="text-cyan-400 text-4xl mb-4 mx-auto" />,
-      skills: ["Java", "Python", "JavaScript"]
+      icon: "ph-code",
+      skills: ["Java", "Python", "JavaScript"],
     },
     {
       title: "Development",
-      icon: <FaCode className="text-cyan-400 text-4xl mb-4 mx-auto" />,
-      skills: [
-        "React", "Next.js", "Tailwind CSS","Node.js", "Express.js", "PostgreSQL", "MongoDB", "Vercel"
-      ],
+      icon: "ph-laptop",
+      skills: ["React", "Next.js", "Tailwind CSS", "Node.js", "Express.js", "PostgreSQL", "MongoDB", "Vercel"],
     },
     {
       title: "AI & Agentic Tools",
-      icon: <FaBrain className="text-cyan-400 text-4xl mb-4 mx-auto" />,
-      skills: [
-        "LLM API's", "LangChain", "RAG", "Pinecone", "FastAPI", "Numpy", "Pandas",
-        "Sklearn", "Matplotlib"
-      ],
+      icon: "ph-brain",
+      skills: ["LLM API's", "LangChain", "RAG", "Pinecone", "FastAPI", "Numpy", "Pandas", "Sklearn", "Matplotlib"],
     },
     {
       title: "Tools",
-      icon: <FaTools className="text-cyan-400 text-4xl mb-4 mx-auto" />,
-      skills: ["Git", "GitHub", "Docker", "Postman", "Figma", "Firebase", "Linux"]
+      icon: "ph-wrench",
+      skills: ["Git", "GitHub", "Docker", "Postman", "Figma", "Firebase", "Linux"],
     },
-    
   ]
 
+  useEffect(() => {
+    const initAnimations = () => {
+      if (typeof window !== "undefined" && (window as any).gsap && (window as any).ScrollTrigger) {
+        const gsap = (window as any).gsap
+        gsap.registerPlugin((window as any).ScrollTrigger)
+
+        // Skills cards animation with stagger
+        gsap.fromTo(
+          skillsRef.current?.children,
+          {
+            opacity: 0,
+            y: 60,
+            scale: 0.8,
+            filter: "blur(10px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 1,
+            ease: "power3.out",
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+              end: "bottom 20%",
+              toggleActions: "play none none reverse",
+            },
+          },
+        )
+      }
+    }
+
+    const checkGSAP = () => {
+      if ((window as any).gsap && (window as any).ScrollTrigger) {
+        initAnimations()
+      } else {
+        setTimeout(checkGSAP, 100)
+      }
+    }
+
+    checkGSAP()
+  }, [])
+
   return (
-    <section id="skills" className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div data-animate className="fade-up text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            My <span className="text-cyan-400">Skills</span>
+    <section ref={sectionRef} id="skills" className="section-padding relative">
+      {/* Background orbs */}
+      <div className="floating-orb floating-orb-1"></div>
+      <div className="floating-orb floating-orb-2"></div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            My <span className="gradient-text">Skills</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base max-w-2xl mx-auto font-light">
             A categorized overview of my development, AI, and tool expertise.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8">
+        {/* Skills Grid */}
+        <div ref={skillsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
           {skillGroups.map((group, idx) => (
-            <div
-              key={idx}
-              data-animate
-              className="fade-up bg-slate-800/50 rounded-2xl p-8 hover:bg-slate-800/70 transition-all duration-300 transform hover:scale-105 text-center"
-              style={{ animationDelay: `${idx * 200}ms` }}
-            >
-              {group.icon}
-              <h3 className="text-xl font-bold text-white mb-4">{group.title}</h3>
-              <p className="text-gray-300 leading-relaxed">
-                {group.skills.join(" · ")}
-              </p>
+            <div key={idx} className="glass-card p-5 rounded-lg text-center">
+              <i className={`${group.icon} text-3xl text-cyan-400 mb-3 block neon-glow`}></i>
+              <h3 className="text-lg font-bold gradient-text mb-3 neon-text">{group.title}</h3>
+              <p className="text-gray-300 leading-relaxed text-sm font-light">{group.skills.join(" · ")}</p>
             </div>
           ))}
         </div>

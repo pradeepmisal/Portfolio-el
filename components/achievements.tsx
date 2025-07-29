@@ -1,17 +1,21 @@
 "use client"
-import Image from "next/image"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Pagination, Autoplay } from "swiper/modules"
-import { Award, Trophy, Star, Medal } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 
-// Import Swiper styles
-import "swiper/css"
-import "swiper/css/navigation"
-import "swiper/css/pagination"
+import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
+import { Award, Trophy, Star, Medal } from "lucide-react"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from "@/components/ui/carousel"
 
 export default function Achievements() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [api, setApi] = useState<CarouselApi>()
+
   const achievements = [
     {
       title: "Openserv Hackathon 2025",
@@ -86,95 +90,149 @@ export default function Achievements() {
     },
   ]
 
+  useEffect(() => {
+    const initAnimations = () => {
+      if (typeof window !== "undefined" && (window as any).gsap && (window as any).ScrollTrigger) {
+        const gsap = (window as any).gsap
+        gsap.registerPlugin((window as any).ScrollTrigger)
+
+        // Achievements section animation (for the whole carousel container)
+        gsap.fromTo(
+          sectionRef.current,
+          {
+            opacity: 0,
+            y: 60,
+            filter: "blur(10px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+              end: "bottom 20%",
+              toggleActions: "play none none reverse",
+            },
+          },
+        )
+      }
+    }
+
+    const checkGSAP = () => {
+      if ((window as any).gsap && (window as any).ScrollTrigger) {
+        initAnimations()
+      } else {
+        setTimeout(checkGSAP, 100)
+      }
+    }
+
+    checkGSAP()
+  }, [])
+
+  // Auto-scroll logic for achievements carousel
+  useEffect(() => {
+    if (!api) return
+
+    let autoplay: NodeJS.Timeout
+
+    const startAutoplay = () => {
+      autoplay = setInterval(() => {
+        api.scrollNext()
+      }, 3000) // Change slide every 3 seconds
+    }
+
+    const stopAutoplay = () => {
+      clearInterval(autoplay)
+    }
+
+    api.on("pointerDown", stopAutoplay) // Stop on user interaction
+    api.on("pointerUp", startAutoplay) // Resume after user interaction
+    api.on("select", () => {
+      // Restart autoplay on manual slide change
+      stopAutoplay()
+      startAutoplay()
+    })
+
+    startAutoplay() // Start autoplay initially
+
+    return () => {
+      stopAutoplay()
+      api.off("pointerDown", stopAutoplay)
+      api.off("pointerUp", startAutoplay)
+      api.off("select", () => {
+        stopAutoplay()
+        startAutoplay()
+      })
+    }
+  }, [api])
+
   return (
-    <section id="achievements" className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div data-animate className="fade-up text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            My <span className="text-purple-400">Achievements</span>
+    <section ref={sectionRef} id="achievements" className="section-padding relative">
+      {/* Background orbs */}
+      <div className="floating-orb floating-orb-1"></div>
+      <div className="floating-orb floating-orb-2"></div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            My <span className="gradient-text">Achievements</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base max-w-2xl mx-auto font-light">
             Recognition and awards I've received for my work and contributions
           </p>
         </div>
 
-        <div data-animate className="fade-up delay-200">
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={30}
-            slidesPerView={1}
-            navigation
-            pagination={{ clickable: true }}
-            autoplay={{
-              delay: 4000,
-              disableOnInteraction: false,
-            }}
-            breakpoints={{
-              640: {
-                slidesPerView: 1,
-              },
-              768: {
-                slidesPerView: 2,
-              },
-              1024: {
-                slidesPerView: 3,
-              },
-            }}
-            className="achievements-swiper"
-          >
+        {/* Achievements Carousel */}
+        <Carousel setApi={setApi} opts={{ loop: true }} className="w-full relative">
+          <CarouselContent className="-ml-4">
             {achievements.map((achievement, index) => (
-              <SwiperSlide key={index}>
-                <Card className="bg-slate-800/50 border-slate-600 hover:bg-slate-800/70 transition-all duration-300 transform hover:scale-105 h-full">
-                  <div className="relative overflow-hidden rounded-t-lg">
+              <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                <div className="glass-card p-4 rounded-lg h-full flex flex-col">
+                  <div className="relative overflow-hidden rounded-md mb-4 group">
                     <Image
                       src={achievement.image || "/placeholder.svg"}
                       alt={achievement.title}
-                      width={300}
-                      height={200}
-                      className="w-full h-48 object-cover"
+                      width={250}
+                      height={150}
+                      className="w-full h-36 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute top-4 right-4">
-                      <achievement.icon className="h-8 w-8 text-yellow-400" />
+                    <div className="absolute top-2 right-2">
+                      <achievement.icon className="h-6 w-6 text-yellow-400 neon-glow" />
+                    </div>
+                    <div className="absolute top-2 left-2">
+                      <span className="glass px-2 py-0.5 rounded-full text-cyan-400 text-xs font-medium">
+                        {achievement.category}
+                      </span>
                     </div>
                   </div>
 
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge className="bg-purple-600/20 text-purple-400">{achievement.category}</Badge>
+                  <div className="mb-3 flex-grow">
+                    <div className="flex justify-between items-start mb-1">
                       {achievement.amount && (
-                        <Badge className="bg-green-600/20 text-green-400">{achievement.amount}</Badge>
+                        <span className="glass px-2 py-0.5 rounded-full text-green-400 text-xs font-medium neon-glow">
+                          {achievement.amount}
+                        </span>
                       )}
                     </div>
-                    <CardTitle className="text-white text-xl mb-2">{achievement.title}</CardTitle>
-                    <CardDescription className="text-purple-400 font-medium">
+                    <h3 className="gradient-text mb-1">{achievement.title}</h3>
+                    <p className="text-cyan-400 font-medium text-xs">
                       {achievement.organization} • {achievement.date}
-                    </CardDescription>
-                  </CardHeader>
+                    </p>
+                  </div>
 
-                  <CardContent>
-                    <p className="text-gray-300 leading-relaxed">{achievement.description}</p>
-                  </CardContent>
-                </Card>
-              </SwiperSlide>
+                  <p className="text-gray-300 leading-relaxed text-sm font-light">{achievement.description}</p>
+                </div>
+              </CarouselItem>
             ))}
-          </Swiper>
-        </div>
+          </CarouselContent>
+          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
+        </Carousel>
       </div>
-
-      <style jsx global>{`
-        .achievements-swiper .swiper-button-next,
-        .achievements-swiper .swiper-button-prev {
-          color: #a855f7;
-        }
-        
-        .achievements-swiper .swiper-pagination-bullet {
-          background: #64748b;
-        }
-        
-        .achievements-swiper .swiper-pagination-bullet-active {
-          background: #a855f7;
-        }
-      `}</style>
     </section>
   )
 }

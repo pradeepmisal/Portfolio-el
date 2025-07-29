@@ -1,12 +1,13 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { ExternalLink, Github, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function Projects() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const projectsGridRef = useRef<HTMLDivElement>(null) // Renamed ref for clarity
+
   const projects = [
     {
       title: "ASSUREFI",
@@ -14,9 +15,8 @@ export default function Projects() {
         "Decentralized AI-based auditing platform for securing smart contracts in DeFi. Ensures real-time scam detection with high accuracy using advanced machine learning algorithms.",
       image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-YaQZb7gVK3TU4DUmF2H9fboN5AqPSi.png",
       technologies: ["React", "Blockchain", "AI/ML", "Smart Contracts", "DeFi", "Web3"],
-      github: "https://github.com/pradeepmisal/ASSUREFI",
+      github: "https://github.com/pradeepmisal/AssureFi-frontend",
       live: "https://assure-fi.vercel.app/",
-      metrics: "Real-time scam detection",
       category: "Blockchain & AI",
     },
     {
@@ -25,9 +25,8 @@ export default function Projects() {
         "AR-based medical assistant for healthcare training. Visualizes complex medical procedures in immersive 3D environments for medical learners and professionals.",
       image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-85wNFTuycFNbt8KMISKXhyTgCsWBdS.png",
       technologies: ["AR", "Unity", "3D Modeling", "Healthcare", "Mobile", "C#"],
-      github: "https://github.com/pradeepmisal/MEDI_AR",
+      github: "https://github.com/pradeepmisal/MEDIAR-frontend",
       live: "https://drive.google.com/drive/u/1/folders/133V791IhyKdw1_VmW85pOIvpMXZ_t54U",
-      metrics: "Immersive 3D training",
       category: "AR & Healthcare",
       isDemo: true,
     },
@@ -39,7 +38,6 @@ export default function Projects() {
       technologies: ["GenAI", "Blockchain", "IBM Watson", "Compliance", "React", "Node.js"],
       github: "https://github.com/pradeepmisal/Veritas-IBM-TechXChange2025",
       live: "https://veritas-nine.vercel.app/",
-      metrics: "ISO 27001 compliance",
       category: "Enterprise AI",
     },
     {
@@ -48,9 +46,8 @@ export default function Projects() {
         "Sustainability tracking app with carbon emission estimates, gamification features, and multilingual SMS capabilities for environmental awareness and action.",
       image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-jqaV8W3pe6sz1vYHQPHCXigh5q98st.png",
       technologies: ["React", "Node.js", "IBM Cloud", "SMS API", "Gamification", "Sustainability"],
-      github: "https://github.com/pradeepmisal/EcoStep_IBM_Call_for_Code_2024",
+      github: "https://github.com/pradeepmisal/ecostep-carbon-awareness",
       live: "https://ecostep-carbon-awareness-made-easy-client.onrender.com/",
-      metrics: "Carbon footprint tracking",
       category: "Sustainability",
     },
     {
@@ -59,9 +56,8 @@ export default function Projects() {
         "Augmented Reality educational project that simplifies complex physics concepts for school students. Uses AR markers to create interactive 3D physics models.",
       image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-8zNWMljYKIIvxcjapIfnxluN9jAXPB.png",
       technologies: ["AR", "Unity", "Education", "3D Physics", "Mobile", "Interactive Learning"],
-      github: "https://github.com/pradeepmisal/Physics-AR",
+      github: "https://github.com/pradeepmisal/Physics-AR-Book",
       live: "https://drive.google.com/drive/folders/1JuDKUdyR_CEWRhjydAa3wyDV9I8LQWyu?usp=sharing",
-      metrics: "Interactive 3D models",
       category: "AR & Education",
       isDemo: true,
     },
@@ -73,123 +69,167 @@ export default function Projects() {
       technologies: ["GenAI", "React", "OpenAI", "Career Guidance", "Machine Learning", "NLP"],
       github: "https://github.com/pradeepmisal/elevateai-frontend",
       live: "https://elevateai-frontend.vercel.app/",
-      metrics: "Personalized AI guidance",
       category: "AI & Career",
     },
   ]
 
+  useEffect(() => {
+    const initAnimations = () => {
+      if (typeof window !== "undefined" && (window as any).gsap && (window as any).ScrollTrigger) {
+        const gsap = (window as any).gsap
+        gsap.registerPlugin((window as any).ScrollTrigger)
+
+        // Projects grid animation
+        gsap.fromTo(
+          projectsGridRef.current?.children,
+          {
+            opacity: 0,
+            y: 60, // Adjusted for grid entrance
+            scale: 0.9,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+            ease: "power3.out",
+            stagger: 0.15, // Slightly reduced stagger for grid
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+              end: "bottom 20%",
+              toggleActions: "play none none reverse",
+            },
+          },
+        )
+      }
+    }
+
+    const checkGSAP = () => {
+      if ((window as any).gsap && (window as any).ScrollTrigger) {
+        initAnimations()
+      } else {
+        setTimeout(checkGSAP, 100)
+      }
+    }
+
+    checkGSAP()
+  }, [])
+
   return (
-    <section id="projects" className="py-20 bg-slate-800/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div data-animate className="fade-up text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            My <span className="text-purple-400">Projects</span>
+    <section ref={sectionRef} id="projects" className="section-padding relative">
+      {/* Background orbs */}
+      <div className="floating-orb floating-orb-1"></div>
+      <div className="floating-orb floating-orb-2"></div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            My <span className="gradient-text">Projects</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base max-w-2xl mx-auto font-light">
             Here are some of the innovative projects I've built, ranging from AI and blockchain to AR and sustainability
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Projects Grid */}
+        <div ref={projectsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => (
-            <Card
-              key={index}
-              data-animate
-              className="fade-up bg-slate-700/50 border-slate-600 hover:bg-slate-700/70 transition-all duration-300 transform hover:scale-105 group"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="relative overflow-hidden rounded-t-lg">
-                <Image
-                  src={project.image || "/placeholder.svg"}
-                  alt={project.title}
-                  width={500}
-                  height={300}
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                {/* Category badge */}
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-purple-600/90 text-white text-xs">{project.category}</Badge>
-                </div>
-              </div>
-
-              <CardHeader>
-                <CardTitle className="text-white text-xl mb-2 group-hover:text-purple-400 transition-colors duration-300">
-                  {project.title}
-                </CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed text-sm">
-                  {project.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {project.metrics && (
-                  <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs">
-                    {project.metrics}
-                  </Badge>
-                )}
-
-                <div className="flex flex-wrap gap-1.5">
-                  {project.technologies.map((tech, techIndex) => (
-                    <Badge key={techIndex} variant="secondary" className="bg-slate-600 text-gray-300 text-xs px-2 py-1">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white flex-1 bg-transparent text-xs"
-                    asChild
-                  >
-                    <a href={project.github} target="_blank" rel="noopener noreferrer">
-                      <Github className="h-3 w-3 mr-1" />
-                      Code
-                    </a>
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 flex-1 text-xs"
-                    asChild
-                  >
-                    <a href={project.live} target="_blank" rel="noopener noreferrer">
-                      {project.isDemo ? (
-                        <>
-                          <Play className="h-3 w-3 mr-1" />
-                          Demo
-                        </>
-                      ) : (
-                        <>
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Live
-                        </>
-                      )}
-                    </a>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <ProjectCard key={index} project={project} />
           ))}
         </div>
 
-        {/* Additional info section */}
-        <div data-animate className="fade-up text-center mt-16">
-          <p className="text-gray-400 text-lg mb-6">
-            🏆 <span className="text-purple-400 font-semibold">7-time hackathon winner</span> across national and
+        {/* Additional Info */}
+        <div className="text-center mt-10">
+          <p className="text-gray-400 text-base mb-3 font-light">
+            🏆 <span className="gradient-text font-semibold">7-time hackathon winner</span> across national and
             international competitions
           </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-            <span className="bg-slate-700/50 px-3 py-1 rounded-full">Health-Tech solutions</span>
-            <span className="bg-slate-700/50 px-3 py-1 rounded-full">Sustainability solutions</span>
-            <span className="bg-slate-700/50 px-3 py-1 rounded-full">DeFi Innovation</span>
-            <span className="bg-slate-700/50 px-3 py-1 rounded-full">AR Innovation</span>
-            <span className="bg-slate-700/50 px-3 py-1 rounded-full">GenAI Solutions</span>
+          <div className="flex flex-wrap justify-center gap-2 text-xs">
+            {[
+              "Health-Tech solutions",
+              "Sustainability solutions",
+              "DeFi Innovation",
+              "AR Innovation",
+              "GenAI Solutions",
+            ].map((tag, i) => (
+              <span key={i} className="glass px-2.5 py-0.5 rounded-full text-gray-300">
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function ProjectCard({ project }: { project: any }) {
+  return (
+    <div className="glass-card p-4 rounded-lg">
+      {" "}
+      {/* Removed min-w classes */}
+      <div className="relative overflow-hidden rounded-md mb-4 group">
+        <Image
+          src={project.image || "/placeholder.svg"}
+          alt={project.title}
+          width={300}
+          height={180}
+          className="w-full h-36 object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+        {/* Category Badge */}
+        <div className="absolute top-2 left-2">
+          <span className="glass px-2 py-0.5 rounded-full text-cyan-400 text-xs font-medium neon-glow">
+            {project.category}
+          </span>
+        </div>
+      </div>
+      <h3 className="gradient-text mb-2">{project.title}</h3>
+      <p className="text-gray-300 leading-relaxed mb-4 text-sm font-light">{project.description}</p>
+      <div className="flex flex-wrap gap-1 mb-4">
+        {project.technologies.slice(0, 4).map((tech: string, techIndex: number) => (
+          <span key={techIndex} className="glass px-2 py-0.5 rounded-full text-gray-300 text-xs">
+            {tech}
+          </span>
+        ))}
+        {project.technologies.length > 4 && (
+          <span className="glass px-2 py-0.5 rounded-full text-gray-400 text-xs">
+            +{project.technologies.length - 4} more
+          </span>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-outline flex-1 text-center py-2 px-3 text-xs flex items-center justify-center gap-1"
+        >
+          <Github className="h-3 w-3" />
+          Code
+        </a>
+        <a
+          href={project.live}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary flex-1 text-center py-2 px-3 text-xs flex items-center justify-center gap-1"
+        >
+          {project.isDemo ? (
+            <>
+              <Play className="h-3 w-3" />
+              Demo
+            </>
+          ) : (
+            <>
+              <ExternalLink className="h-3 w-3" />
+              Live
+            </>
+          )}
+        </a>
+      </div>
+    </div>
   )
 }
