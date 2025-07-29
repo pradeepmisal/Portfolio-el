@@ -70,21 +70,21 @@ export default function Contact() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        if (!isMobile) {
-          // Apply animations only on desktop
+        if (isMobile) {
+          // Apply animations only on mobile
           // Contact info animation
           gsap.fromTo(
             contactInfoRef.current,
             {
               opacity: 0,
-              x: -30, // Reduced translation
-              // filter: "blur(10px)", // Removed blur
+              x: -60,
+              filter: "blur(10px)",
             },
             {
               opacity: 1,
               x: 0,
-              // filter: "blur(0px)", // Removed blur
-              duration: 0.8, // Reduced duration
+              filter: "blur(0px)",
+              duration: 1.2,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
@@ -100,14 +100,14 @@ export default function Contact() {
             formRef.current,
             {
               opacity: 0,
-              x: 30, // Reduced translation
-              // filter: "blur(10px)", // Removed blur
+              x: 60,
+              filter: "blur(10px)",
             },
             {
               opacity: 1,
               x: 0,
-              // filter: "blur(0px)", // Removed blur
-              duration: 0.8, // Reduced duration
+              filter: "blur(0px)",
+              duration: 1.2,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
@@ -118,7 +118,7 @@ export default function Contact() {
             },
           )
         } else {
-          // For mobile, ensure elements are visible by default
+          // For desktop, ensure elements are visible by default
           if (contactInfoRef.current) contactInfoRef.current.style.opacity = "1"
           if (formRef.current) formRef.current.style.opacity = "1"
         }

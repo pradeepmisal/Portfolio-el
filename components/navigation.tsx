@@ -27,7 +27,7 @@ export default function Navigation() {
 
   return (
     // Always apply nav-glass for consistent visibility
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 nav-glass`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-100 nav-glass`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           {/* Logo */}

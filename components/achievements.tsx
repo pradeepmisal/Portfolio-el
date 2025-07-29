@@ -98,21 +98,21 @@ export default function Achievements() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        if (!isMobile) {
-          // Apply animations only on desktop
+        if (isMobile) {
+          // Apply animations only on mobile
           // Achievements section animation (for the whole carousel container)
           gsap.fromTo(
             sectionRef.current,
             {
               opacity: 0,
-              y: 30, // Reduced translation
-              // filter: "blur(10px)", // Removed blur
+              y: 60,
+              filter: "blur(10px)",
             },
             {
               opacity: 1,
               y: 0,
-              // filter: "blur(0px)", // Removed blur
-              duration: 0.8, // Reduced duration
+              filter: "blur(0px)",
+              duration: 1,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
@@ -123,7 +123,7 @@ export default function Achievements() {
             },
           )
         } else {
-          // For mobile, ensure elements are visible by default
+          // For desktop, ensure elements are visible by default
           if (sectionRef.current) sectionRef.current.style.opacity = "1"
         }
       }

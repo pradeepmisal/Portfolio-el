@@ -81,23 +81,23 @@ export default function Projects() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        if (!isMobile) {
-          // Apply animations only on desktop
+        if (isMobile) {
+          // Apply animations only on mobile
           // Projects grid animation
           gsap.fromTo(
             projectsGridRef.current?.children,
             {
               opacity: 0,
-              y: 30, // Reduced translation
-              scale: 0.95, // Reduced scale effect
+              y: 60, // Adjusted for grid entrance
+              scale: 0.9,
             },
             {
               opacity: 1,
               y: 0,
               scale: 1,
-              duration: 0.7, // Reduced duration
+              duration: 1,
               ease: "power3.out",
-              stagger: 0.08, // Reduced stagger
+              stagger: 0.15, // Slightly reduced stagger for grid
               scrollTrigger: {
                 trigger: sectionRef.current,
                 start: "top 80%",
@@ -107,7 +107,7 @@ export default function Projects() {
             },
           )
         } else {
-          // For mobile, ensure elements are visible by default
+          // For desktop, ensure elements are visible by default
           if (projectsGridRef.current) {
             Array.from(projectsGridRef.current.children).forEach((child) => {
               ;(child as HTMLElement).style.opacity = "1"

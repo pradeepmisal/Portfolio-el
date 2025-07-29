@@ -26,21 +26,21 @@ export default function About() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        if (!isMobile) {
-          // Apply animations only on desktop
+        if (isMobile) {
+          // Apply animations only on mobile
           // Image container animation
           gsap.fromTo(
             imageContainerRef.current,
             {
               opacity: 0,
-              x: -30, // Reduced translation
-              // filter: "blur(10px)", // Removed blur
+              x: -60,
+              filter: "blur(10px)",
             },
             {
               opacity: 1,
               x: 0,
-              // filter: "blur(0px)", // Removed blur
-              duration: 0.8, // Reduced duration
+              filter: "blur(0px)",
+              duration: 1.2,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
@@ -56,14 +56,14 @@ export default function About() {
             contentRef.current,
             {
               opacity: 0,
-              x: 30, // Reduced translation
-              // filter: "blur(10px)", // Removed blur
+              x: 60,
+              filter: "blur(10px)",
             },
             {
               opacity: 1,
               x: 0,
-              // filter: "blur(0px)", // Removed blur
-              duration: 0.8, // Reduced duration
+              filter: "blur(0px)",
+              duration: 1.2,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
@@ -79,16 +79,16 @@ export default function About() {
             statsRef.current?.children,
             {
               opacity: 0,
-              y: 20, // Reduced translation
-              scale: 0.95, // Slightly reduced scale effect
+              y: 40,
+              scale: 0.8,
             },
             {
               opacity: 1,
               y: 0,
               scale: 1,
-              duration: 0.5, // Reduced duration
+              duration: 0.8,
               ease: "back.out(1.7)",
-              stagger: 0.05, // Reduced stagger
+              stagger: 0.1,
               scrollTrigger: {
                 trigger: statsRef.current,
                 start: "top 90%",
@@ -98,7 +98,7 @@ export default function About() {
             },
           )
         } else {
-          // For mobile, ensure elements are visible by default
+          // For desktop, ensure elements are visible by default
           if (imageContainerRef.current) imageContainerRef.current.style.opacity = "1"
           if (contentRef.current) contentRef.current.style.opacity = "1"
           if (statsRef.current) {
