@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useIsMobile } from "@/hooks/use-mobile" // Import useIsMobile hook
 
 export default function Skills() {
   const sectionRef = useRef<HTMLElement>(null)
   const skillsRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile() // Get mobile state
 
   const skillGroups = [
     {
@@ -35,31 +37,41 @@ export default function Skills() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        // Skills cards animation with stagger
-        gsap.fromTo(
-          skillsRef.current?.children,
-          {
-            opacity: 0,
-            y: 60,
-            scale: 0.8,
-            filter: "blur(10px)",
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: "blur(0px)",
-            duration: 1,
-            ease: "power3.out",
-            stagger: 0.2,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              toggleActions: "play reverse play reverse", // Updated toggleActions
+        if (!isMobile) {
+          // Apply animations only on desktop
+          // Skills cards animation with stagger
+          gsap.fromTo(
+            skillsRef.current?.children,
+            {
+              opacity: 0,
+              y: 30, // Reduced translation
+              scale: 0.95, // Reduced scale effect
+              // filter: "blur(10px)", // Removed blur
             },
-          },
-        )
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              // filter: "blur(0px)", // Removed blur
+              duration: 0.7, // Reduced duration
+              ease: "power3.out",
+              stagger: 0.08, // Reduced stagger
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play reverse play reverse",
+              },
+            },
+          )
+        } else {
+          // For mobile, ensure elements are visible by default
+          if (skillsRef.current) {
+            Array.from(skillsRef.current.children).forEach((child) => {
+              ;(child as HTMLElement).style.opacity = "1"
+            })
+          }
+        }
       }
     }
 
@@ -72,7 +84,7 @@ export default function Skills() {
     }
 
     checkGSAP()
-  }, [])
+  }, [isMobile]) // Re-run effect if isMobile changes
 
   return (
     <section ref={sectionRef} id="skills" className="section-padding relative">

@@ -3,10 +3,12 @@
 import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { ExternalLink, Github, Play } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile" // Import useIsMobile hook
 
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null)
-  const projectsGridRef = useRef<HTMLDivElement>(null) // Renamed ref for clarity
+  const projectsGridRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile() // Get mobile state
 
   const projects = [
     {
@@ -79,29 +81,39 @@ export default function Projects() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        // Projects grid animation
-        gsap.fromTo(
-          projectsGridRef.current?.children,
-          {
-            opacity: 0,
-            y: 60, // Adjusted for grid entrance
-            scale: 0.9,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 1,
-            ease: "power3.out",
-            stagger: 0.15, // Slightly reduced stagger for grid
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              toggleActions: "play reverse play reverse",
+        if (!isMobile) {
+          // Apply animations only on desktop
+          // Projects grid animation
+          gsap.fromTo(
+            projectsGridRef.current?.children,
+            {
+              opacity: 0,
+              y: 30, // Reduced translation
+              scale: 0.95, // Reduced scale effect
             },
-          },
-        )
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7, // Reduced duration
+              ease: "power3.out",
+              stagger: 0.08, // Reduced stagger
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play reverse play reverse",
+              },
+            },
+          )
+        } else {
+          // For mobile, ensure elements are visible by default
+          if (projectsGridRef.current) {
+            Array.from(projectsGridRef.current.children).forEach((child) => {
+              ;(child as HTMLElement).style.opacity = "1"
+            })
+          }
+        }
       }
     }
 
@@ -114,7 +126,7 @@ export default function Projects() {
     }
 
     checkGSAP()
-  }, [])
+  }, [isMobile]) // Re-run effect if isMobile changes
 
   return (
     <section ref={sectionRef} id="projects" className="section-padding relative">

@@ -11,10 +11,12 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel"
+import { useIsMobile } from "@/hooks/use-mobile" // Import useIsMobile hook
 
 export default function Achievements() {
   const sectionRef = useRef<HTMLElement>(null)
   const [api, setApi] = useState<CarouselApi>()
+  const isMobile = useIsMobile() // Get mobile state
 
   const achievements = [
     {
@@ -96,28 +98,34 @@ export default function Achievements() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        // Achievements section animation (for the whole carousel container)
-        gsap.fromTo(
-          sectionRef.current,
-          {
-            opacity: 0,
-            y: 60,
-            filter: "blur(10px)",
-          },
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              toggleActions: "play reverse play reverse",
+        if (!isMobile) {
+          // Apply animations only on desktop
+          // Achievements section animation (for the whole carousel container)
+          gsap.fromTo(
+            sectionRef.current,
+            {
+              opacity: 0,
+              y: 30, // Reduced translation
+              // filter: "blur(10px)", // Removed blur
             },
-          },
-        )
+            {
+              opacity: 1,
+              y: 0,
+              // filter: "blur(0px)", // Removed blur
+              duration: 0.8, // Reduced duration
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play reverse play reverse",
+              },
+            },
+          )
+        } else {
+          // For mobile, ensure elements are visible by default
+          if (sectionRef.current) sectionRef.current.style.opacity = "1"
+        }
       }
     }
 
@@ -130,7 +138,7 @@ export default function Achievements() {
     }
 
     checkGSAP()
-  }, [])
+  }, [isMobile]) // Re-run effect if isMobile changes
 
   // Auto-scroll logic for achievements carousel
   useEffect(() => {

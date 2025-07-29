@@ -4,11 +4,13 @@ import type React from "react"
 
 import { useEffect, useRef, useState } from "react"
 import { Mail, Phone, MapPin, Send, FileText, Github, Linkedin, Twitter, CheckCircle } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile" // Import useIsMobile hook
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
   const contactInfoRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile() // Get mobile state
 
   const [formData, setFormData] = useState({
     name: "",
@@ -68,51 +70,58 @@ export default function Contact() {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
 
-        // Contact info animation
-        gsap.fromTo(
-          contactInfoRef.current,
-          {
-            opacity: 0,
-            x: -60,
-            filter: "blur(10px)",
-          },
-          {
-            opacity: 1,
-            x: 0,
-            filter: "blur(0px)",
-            duration: 1.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              toggleActions: "play reverse play reverse",
+        if (!isMobile) {
+          // Apply animations only on desktop
+          // Contact info animation
+          gsap.fromTo(
+            contactInfoRef.current,
+            {
+              opacity: 0,
+              x: -30, // Reduced translation
+              // filter: "blur(10px)", // Removed blur
             },
-          },
-        )
+            {
+              opacity: 1,
+              x: 0,
+              // filter: "blur(0px)", // Removed blur
+              duration: 0.8, // Reduced duration
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play reverse play reverse",
+              },
+            },
+          )
 
-        // Form animation
-        gsap.fromTo(
-          formRef.current,
-          {
-            opacity: 0,
-            x: 60,
-            filter: "blur(10px)",
-          },
-          {
-            opacity: 1,
-            x: 0,
-            filter: "blur(0px)",
-            duration: 1.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              end: "bottom 20%",
-              toggleActions: "play reverse play reverse",
+          // Form animation
+          gsap.fromTo(
+            formRef.current,
+            {
+              opacity: 0,
+              x: 30, // Reduced translation
+              // filter: "blur(10px)", // Removed blur
             },
-          },
-        )
+            {
+              opacity: 1,
+              x: 0,
+              // filter: "blur(0px)", // Removed blur
+              duration: 0.8, // Reduced duration
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play reverse play reverse",
+              },
+            },
+          )
+        } else {
+          // For mobile, ensure elements are visible by default
+          if (contactInfoRef.current) contactInfoRef.current.style.opacity = "1"
+          if (formRef.current) formRef.current.style.opacity = "1"
+        }
       }
     }
 
@@ -125,7 +134,7 @@ export default function Contact() {
     }
 
     checkGSAP()
-  }, [])
+  }, [isMobile])
 
   return (
     <section ref={sectionRef} id="contact" className="section-padding relative">
