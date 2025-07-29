@@ -42,7 +42,7 @@ export default function About() {
               trigger: sectionRef.current,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play reverse play reverse",
             },
           },
         )
@@ -65,7 +65,7 @@ export default function About() {
               trigger: sectionRef.current,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play reverse play reverse",
             },
           },
         )
@@ -89,7 +89,7 @@ export default function About() {
               trigger: statsRef.current,
               start: "top 90%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play reverse play reverse",
             },
           },
         )
@@ -188,7 +188,7 @@ export default function About() {
                   key={index}
                   className="text-center p-4 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors duration-300 hover:scale-105 transform"
                 >
-                  <stat.icon className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                  <stat.icon className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
                   <div className="text-2xl font-bold text-white">{stat.value}</div>
                   <div className="text-gray-400 text-sm">{stat.label}</div>
                 </div>
