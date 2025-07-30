@@ -99,7 +99,11 @@ export default function Home() {
       {/* Move Navigation component here, outside the data-scroll-container */}
       <Navigation />
 
-      <div className={`main-content ${contentVisible ? "content-visible" : "content-hidden"}`} data-scroll-container>
+      <div
+        className={`main-content ${contentVisible ? "content-visible" : "content-hidden"}`}
+        data-scroll-container
+        style={{ paddingBottom: 0, marginBottom: 0 }} // Added this line
+      >
         {/* Global particles */}
         <div className="particles-container">
           {[...Array(50)].map((_, i) => (
