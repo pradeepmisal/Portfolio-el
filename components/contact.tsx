@@ -137,7 +137,7 @@ export default function Contact() {
   }, [isMobile])
 
   return (
-    <section ref={sectionRef} id="contact" className="py-20 relative">
+    <section ref={sectionRef} id="contact" className="pt-20 pb-0 relative">
       {/* Background orbs */}
       <div className="floating-orb floating-orb-1"></div>
       <div className="floating-orb floating-orb-2"></div>
