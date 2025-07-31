@@ -24,29 +24,30 @@ export default function Home() {
   }
 
   const initScrollAnimations = () => {
-    if (typeof window !== "undefined") {
-      // Check if GSAP is available
-      if ((window as any).gsap && (window as any).ScrollTrigger) {
+    if (typeof window === "undefined") return
+
+    const checkLocomotiveAndGSAP = () => {
+      if ((window as any).gsap && (window as any).ScrollTrigger && (window as any).LocomotiveScroll) {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
-        console.log("GSAP initialized") // Debug log
+        console.log("GSAP and ScrollTrigger initialized") // Debug log
 
-        // Initialize Locomotive Scroll if available
-        if ((window as any).LocomotiveScroll) {
-          try {
-            const scroll = new (window as any).LocomotiveScroll({
-              el: document.querySelector("[data-scroll-container]"),
-              smooth: true,
-              multiplier: 1,
-              class: "is-reveal",
-            })
+        try {
+          const scroll = new (window as any).LocomotiveScroll({
+            el: document.querySelector("[data-scroll-container]"),
+            smooth: true,
+            multiplier: 1,
+            class: "is-reveal",
+          })
+          console.log("Locomotive Scroll initialized successfully!", scroll) // Debug log
+          console.log("Locomotive Scroll calculated limit Y:", scroll.scroll.instance.limit.y) // New debug log
 
-            // Update ScrollTrigger when Locomotive Scroll updates
-            scroll.on("scroll", (window as any).ScrollTrigger.update)
-
-            // Refresh ScrollTrigger and Locomotive Scroll
-            gsap.registerPlugin((window as any).ScrollTrigger)
-            ;(window as any).ScrollTrigger.scrollerProxy("[data-scroll-container]", {
+          scroll
+            .on(
+              "scroll",
+              (window as any).ScrollTrigger.update,
+            )(window as any)
+            .ScrollTrigger.scrollerProxy("[data-scroll-container]", {
               scrollTop(value: number) {
                 return arguments.length ? scroll.scrollTo(value, 0, 0) : scroll.scroll.instance.scroll.y
               },
@@ -54,31 +55,30 @@ export default function Home() {
                 return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }
               },
               pinType: document.querySelector("[data-scroll-container]")?.style.transform ? "transform" : "fixed",
-            })
-            ;(window as any).ScrollTrigger.addEventListener("refresh", () => scroll.update())
-            ;(window as any).ScrollTrigger.refresh()
-          } catch (error) {
-            console.log("Locomotive Scroll not available, using regular scroll")
-          }
+            })(window as any)
+            .ScrollTrigger.addEventListener("refresh", () => scroll.update())(window as any)
+            .ScrollTrigger.refresh()
+        } catch (error) {
+          console.error("Error initializing Locomotive Scroll:", error) // More specific error log
         }
       } else {
-        console.log("GSAP not available, using CSS animations")
+        console.log("Waiting for GSAP, ScrollTrigger, or LocomotiveScroll to load...")
+        setTimeout(checkLocomotiveAndGSAP, 200) // Retry after 200ms
       }
     }
+
+    checkLocomotiveAndGSAP()
   }
 
   useEffect(() => {
-    // Prevent scroll during loading
-    if (isLoading) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
+    // Prevent native scroll during loading. Locomotive Scroll will manage scroll after initialization.
+    document.body.style.overflow = "hidden"
 
+    // Cleanup function to reset overflow if component unmounts before preloader completes
     return () => {
-      document.body.style.overflow = "unset"
+      document.body.style.overflow = "" // Reset to default
     }
-  }, [isLoading])
+  }, []) // Run only once on mount
 
   // Force complete loading after 10 seconds as fallback
   useEffect(() => {
@@ -96,13 +96,12 @@ export default function Home() {
     <>
       {isLoading && <Preloader onComplete={handlePreloaderComplete} />}
 
-      {/* Move Navigation component here, outside the data-scroll-container */}
       <Navigation />
 
       <div
         className={`main-content ${contentVisible ? "content-visible" : "content-hidden"}`}
         data-scroll-container
-        style={{ paddingBottom: 0, marginBottom: 0 }} // Added this line
+        // Removed inline style for paddingBottom and marginBottom
       >
         {/* Global particles */}
         <div className="particles-container">
@@ -118,20 +117,16 @@ export default function Home() {
             />
           ))}
         </div>
-
         {/* Global floating orbs */}
         <div className="floating-orb floating-orb-1"></div>
         <div className="floating-orb floating-orb-2"></div>
         <div className="floating-orb floating-orb-3"></div>
-
-        {/* Remove Navigation from here */}
-        {/* <Navigation /> */}
         <Hero />
         <About />
         <Skills />
         <Projects />
         <Achievements />
-        <Contact />
+        <Contact data-scroll-section /> {/* Added data-scroll-section */}
       </div>
     </>
   )
