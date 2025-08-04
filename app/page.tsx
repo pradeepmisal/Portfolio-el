@@ -13,6 +13,7 @@ import Contact from "@/components/contact"
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [contentVisible, setContentVisible] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const handlePreloaderComplete = () => {
     console.log("Preloader completed") // Debug log
@@ -26,11 +27,38 @@ export default function Home() {
   const initScrollAnimations = () => {
     if (typeof window === "undefined") return
 
+    // Check if device is mobile
+    const checkMobile = () => {
+      const mobile =
+        window.innerWidth <= 768 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(mobile)
+      return mobile
+    }
+
+    const isMobileDevice = checkMobile()
+
+    if (isMobileDevice) {
+      // For mobile: Enable native scrolling
+      console.log("Mobile device detected - using native scroll")
+      document.body.style.overflow = "auto"
+      document.documentElement.style.overflow = "auto"
+
+      // Initialize GSAP without Locomotive Scroll
+      if ((window as any).gsap && (window as any).ScrollTrigger) {
+        const gsap = (window as any).gsap
+        gsap.registerPlugin((window as any).ScrollTrigger)
+        console.log("GSAP initialized for mobile")
+      }
+      return
+    }
+
+    // For desktop: Use Locomotive Scroll
     const checkLocomotiveAndGSAP = () => {
       if ((window as any).gsap && (window as any).ScrollTrigger && (window as any).LocomotiveScroll) {
         const gsap = (window as any).gsap
         gsap.registerPlugin((window as any).ScrollTrigger)
-        console.log("GSAP and ScrollTrigger initialized") // Debug log
+        console.log("GSAP and ScrollTrigger initialized for desktop") // Debug log
 
         try {
           const scroll = new (window as any).LocomotiveScroll({
@@ -40,7 +68,7 @@ export default function Home() {
             class: "is-reveal",
           })
           console.log("Locomotive Scroll initialized successfully!", scroll) // Debug log
-          console.log("Locomotive Scroll calculated limit Y:", scroll.scroll.instance.limit.y) // New debug log
+          console.log("Locomotive Scroll calculated limit Y:", scroll.scroll.instance.limit.y) // Debug log
 
           scroll
             .on(
@@ -71,14 +99,29 @@ export default function Home() {
   }
 
   useEffect(() => {
-    // Prevent native scroll during loading. Locomotive Scroll will manage scroll after initialization.
+    // Initially prevent native scroll during loading
     document.body.style.overflow = "hidden"
 
-    // Cleanup function to reset overflow if component unmounts before preloader completes
+    // Handle window resize to detect mobile/desktop changes
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768
+      if (mobile !== isMobile) {
+        setIsMobile(mobile)
+        // Reload page if device type changes to reinitialize scroll properly
+        if (contentVisible) {
+          window.location.reload()
+        }
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+
+    // Cleanup function
     return () => {
+      window.removeEventListener("resize", handleResize)
       document.body.style.overflow = "" // Reset to default
     }
-  }, []) // Run only once on mount
+  }, [isMobile, contentVisible])
 
   // Force complete loading after 10 seconds as fallback
   useEffect(() => {
@@ -100,8 +143,8 @@ export default function Home() {
 
       <div
         className={`main-content ${contentVisible ? "content-visible" : "content-hidden"}`}
-        data-scroll-container
-        // Removed inline style for paddingBottom and marginBottom
+        data-scroll-container={!isMobile ? true : undefined} // Only add data-scroll-container on desktop
+        style={isMobile ? { overflow: "auto" } : undefined} // Enable scroll on mobile
       >
         {/* Global particles */}
         <div className="particles-container">
@@ -126,7 +169,7 @@ export default function Home() {
         <Skills />
         <Projects />
         <Achievements />
-        <Contact data-scroll-section /> {/* Added data-scroll-section */}
+        <Contact data-scroll-section={!isMobile ? true : undefined} /> {/* Only add data-scroll-section on desktop */}
       </div>
     </>
   )

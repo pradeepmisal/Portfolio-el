@@ -27,7 +27,6 @@
 html {
   scroll-behavior: smooth;
   height: auto;
-  overflow-y: hidden; /* Removed !important */
 }
 
 body {
@@ -35,10 +34,35 @@ body {
   background: var(--dark-bg);
   color: var(--text-primary);
   overflow-x: hidden;
-  overflow-y: hidden; /* Removed !important */
   line-height: 1.6;
   font-weight: 300;
   letter-spacing: -0.02em;
+}
+
+/* Desktop-specific styles */
+@media (min-width: 769px) {
+  html {
+    overflow-y: hidden;
+  }
+
+  body {
+    overflow-y: hidden;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  html {
+    overflow-y: auto;
+  }
+
+  body {
+    overflow-y: auto;
+  }
+
+  .main-content {
+    overflow-y: auto !important;
+  }
 }
 
 /* ===== LOADING ANIMATION ===== */
